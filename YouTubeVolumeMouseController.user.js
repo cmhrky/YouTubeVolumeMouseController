@@ -1,14 +1,19 @@
 // ==UserScript==
 // @name            YouTube Volume Mouse Controller
-// @namespace       wddd
-// @version         1.5.0
-// @author          wddd
+// @namespace       cmhrky
+// @version         1.5.1
+// @author          cmhrky
 // @license         MIT
 // @description     Control YouTube video volume by mouse wheel.
-// @homepage        https://github.com/wdwind/YouTubeVolumeMouseController
-// @downloadURL     https://github.com/wdwind/YouTubeVolumeMouseController/raw/master/YouTubeVolumeMouseController.user.js
+// @homepage        https://github.com/cmhrky/YouTubeVolumeMouseController
+// @downloadURL     https://github.com/cmhrky/YouTubeVolumeMouseController/raw/master/YouTubeVolumeMouseController.user.js
 // @match           *://www.youtube.com/*
 // ==/UserScript==
+
+/*
+Original code v1.5.0: https://github.com/wdwind/YouTubeVolumeMouseController
+Added show volume status with YouTube video player volume slider.
+*/
 
 function getVideo() {
     return document.getElementsByTagName("video")[0];
@@ -63,8 +68,33 @@ function showSlider(timer, volume) {
     if (timer) {
         clearTimeout(timer);
     }
+    // Show volume status with YouTube video player volume slider
+      cb = document.querySelector(".ytp-chrome-bottom");
+    h5pl = document.querySelector(".html5-video-player");
 
-    var sliderBar = appendSlideBar();
+    if (cb) {
+
+      if (!cb.classList.contains("ytp-volume-slider-active")) {
+        cb.classList.add("ytp-volume-slider-active"),
+        h5pl.classList.remove("ytp-autohide");
+      }
+
+      if (cb.timer) {
+        window.clearTimeout(cb.timer);
+      }
+
+      h5pl.dispatchEvent(new Event("mousemove"));
+
+      cb.timer = window.setTimeout(function () {
+        if (cb && cb.classList.contains("ytp-volume-slider-active")) {
+
+          cb.classList.remove("ytp-volume-slider-active");
+          delete cb.timer;
+        }
+      }, 3000);
+    }
+
+/*    var sliderBar = appendSlideBar();
 
     sliderBar.style.display = "block";
     timer = setTimeout(function () {
@@ -72,10 +102,10 @@ function showSlider(timer, volume) {
     }, 1000);
 
     sliderBar.innerText = "Volume: " + volume;
-
+*/
     return timer;
 }
-
+/*
 function appendSlideBar() {
     var sliderBar = document.getElementById("sliderBar");
     if (!sliderBar) {
@@ -127,7 +157,7 @@ function getSliderBarTopProp() {
 
     return Math.max(fullScreenTitleHeight, overlap);
 }
-
+*/
 /**
  * YouTube use Javascript to navigate between pages. So the script will not work:
  * 1. If the script only includes/matches the sub pages (like the video page www.youtube.com/watch?v=...)
